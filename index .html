@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JK_FOOTBALL - Ultimate Football IQ</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+        body {
+            background-color: #060913;
+            color: #e2e8f0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        .logo-container {
+            padding: 15px;
+            border-radius: 16px;
+            background: linear-gradient(145deg, #0b132b, #111c44);
+            border: 1px solid rgba(0, 242, 254, 0.2);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.1);
+            margin-bottom: 25px;
+        }
+        .logo-text {
+            font-size: 26px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 0 0 10px #00f2fe, 0 0 20px #00f2fe;
+        }
+        .match-card {
+            background: #0b132b;
+            border: 1px solid #1c2541;
+            padding: 20px;
+            border-radius: 14px;
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .vs {
+            color: #ff7b72;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+        .status-text {
+            color: #00f2fe;
+            font-size: 16px;
+            margin-bottom: 35px;
+            font-weight: bold;
+        }
+
+        /* Buttons Container */
+        .btn-wrapper {
+            position: relative;
+            height: 150px;
+            width: 100%;
+        }
+        .game-btn {
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            border: 1px solid #1c2541;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: background 0.2s, transform 0.1s;
+        }
+        
+        /* ፖርቹጋል ቁልፍ */
+        #portugal-btn {
+            background: #111c44;
+            color: #ffffff;
+            border-color: #7ee787;
+            position: absolute;
+            left: 10%;
+            top: 20px;
+            width: 35%;
+        }
+        #portugal-btn:hover {
+            box-shadow: 0 0 15px rgba(126, 231, 135, 0.4);
+        }
+
+        /* ክሮሺያ ቁልፍ - የሚያመልጠው */
+        #croatia-btn {
+            background: #111c44;
+            color: #ffffff;
+            border-color: #ff7b72;
+            position: absolute;
+            right: 10%;
+            top: 20px;
+            width: 35%;
+            transition: all 0.15s ease-out; /* በፍጥነት እንዲያመልጥ */
+        }
+
+        /* Result View */
+        .result-box {
+            background: linear-gradient(145deg, rgba(126, 231, 135, 0.1), rgba(6, 9, 19, 0.4));
+            border: 2px dashed #7ee787;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #7ee787;
+            display: none;
+            margin-top: 20px;
+            text-shadow: 0 0 10px rgba(126, 231, 135, 0.2);
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        footer {
+            margin-top: 60px;
+            color: #475569;
+            font-size: 11px;
+            letter-spacing: 1px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-container">
+        <div class="logo-text">⚽ JK_FOOTBALL IQ ⚽</div>
+    </div>
+
+    <!-- የጨዋታው ካርድ -->
+    <div class="match-card">
+        PORTUGAL <span class="vs">VS</span> CROATIA
+    </div>
+
+    <div class="status-text" id="status">ማነው ሚያሸንፈው? መርጥና እውቀትህን አስመስክር!</div>
+
+    <!-- የቁልፎች መገኛ -->
+    <div class="btn-wrapper" id="wrapper">
+        <button class="game-btn" id="portugal-btn" onclick="selectPortugal()">🇵🇹 PORTUGAL</button>
+        <button class="game-btn" id="croatia-btn" onmouseover="escapeCroatia()" onclick="escapeCroatia()">🇭🇷 CROATIA</button>
+    </div>
+
+    <!-- የውጤት ማሳያ -->
+    <div class="result-box" id="result-screen"></div>
+
+    <footer>POWERED BY JOKER (The7jk) • 2026</footer>
+</div>
+
+<script>
+    const croatiaBtn = document.getElementById('croatia-btn');
+    const portugalBtn = document.getElementById('portugal-btn');
+    const statusText = document.getElementById('status');
+    const resultScreen = document.getElementById('result-screen');
+    const wrapper = document.getElementById('wrapper');
+
+    // ተጠቃሚው ክሮሺያን ለመንካት ሲሞክር ቁልፉ ቦታውን ይቀይራል (ያመልጣል)
+    function escapeCroatia() {
+        // በ wrapper ክልል ውስጥ በዘፈቀደ (Random) ቦታዎችን መፍጠር
+        const containerWidth = wrapper.clientWidth;
+        const containerHeight = wrapper.clientHeight;
+
+        // አዲሶቹን መጋጠሚያዎች ማስላት (ከክልሉ እንዳይወጣ ቁልፉን መጠን በመቀነስ)
+        const newLeft = Math.floor(Math.random() * (containerWidth - croatiaBtn.clientWidth));
+        const newTop = Math.floor(Math.random() * (containerHeight - croatiaBtn.clientHeight));
+
+        croatiaBtn.style.left = newLeft + 'px';
+        croatiaBtn.style.top = newTop + 'px';
+        
+        statusText.innerText = " አይይይ... ክሮሺያን መምረጥ አአልቻልክም ?ሞክር እስቲ!";
+        statusText.style.color = "#ff7b72";
+    }
+
+    // ፖርቹጋልን ሲመርጡ የሚወጣው የመጨረሻ ውጤት
+    function selectPortugal() {
+        statusText.innerText = "ትክክለኛ ምርጫ! 🎯";
+        statusText.style.color = "#7ee787";
+        
+        // ክሮሺያን ማጥፋት
+        croatiaBtn.style.display = 'none';
+        
+        // ፖርቹጋልን መሃል ላይ ማድረግ
+        portugalBtn.style.position = 'relative';
+        portugalBtn.style.left = 'auto';
+        portugalBtn.style.top = 'auto';
+        portugalBtn.style.margin = '0 auto';
+        portugalBtn.style.width = '60%';
+
+        // ውጤቱን ማሳየት
+        resultScreen.innerHTML = "👑 መጀመሪያም PORTUGAL ከመረጥክ. 🙂‍↕🫴 👑 ካልመረጥክ 🙂‍↕🫴 🧠<br><br>💎 You have **Ultimate, Elite Football Knowledge**! 💎";
+        resultScreen.style.display = "block";
+    }
+</script>
+
+</body>
+</html>
